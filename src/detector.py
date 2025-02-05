@@ -40,8 +40,6 @@ def wheel_detector(image):
             w_confidence = wheel_box.conf[0]
             if w_confidence > 0.4:
                 wheels.append((wx1, wy1, wx2, wy2))
-                
-        print(len(wheels))
 
         if len(wheels) >= 2:
             # คำนวณกรอบใหม่ที่ครอบคลุมล้อทั้งสองข้าง
@@ -61,8 +59,6 @@ def wheel_detector(image):
     wheel_croped = np.zeros((30,30))
     
     '''
-    
-    print(wheel_croped)
     return wheel_croped
 
 def windshield_detector(image):

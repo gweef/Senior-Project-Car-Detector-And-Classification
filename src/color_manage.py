@@ -59,8 +59,6 @@ def luminance_edit(image):
     luminance = L.astype(np.float32)
 
     # คำนวณค่า Max, Min, Median ของ Luminance
-    luminance_max = np.max(luminance)
-    luminance_min = np.min(luminance)
     luminance_median = np.median(luminance)
 
     # 🔹 Trimmed Mean (เอาเฉพาะค่ากลาง 90%)
@@ -138,9 +136,9 @@ def hsv_classify(h,s,v):
     '''
 
 def color_classifier(image):
-    luminance_edited = luminance_edit(image)
-    print('aaaa')
-    blur_edited = blur_edit(luminance_edited) 
+    #luminance_edited = luminance_edit(image)
+    blur_edited = blur_edit(image) 
     h,s,v = k_means_clustering(blur_edited)
     color_name_classify = hsv_classify(h,s,v)
+    print(color_name_classify)
     return color_name_classify,h,s,v

@@ -1,6 +1,6 @@
 import tkinter as tk
 from ui.class_ui import AppUI
-from ui.component import on_start, cancel_action, open_video_file,export_action,details_action,exportvar_action,resetcall
+from ui.component import on_start, cancel_action, open_video_file,export_action,details_action,exportvar_action,resetcall,on_closing
 
 
 def main_ui() :
@@ -49,6 +49,8 @@ def main_ui() :
     app_ui.reset_button.config(
         command= lambda : resetcall(app_ui)
     )
+    
+    root.protocol("WM_DELETE_WINDOW", lambda: on_closing(root))
 
     
     

@@ -13,12 +13,8 @@ class Car:
     h : int
     s : int
     v : int
-    x1: int
-    y1: int
-    x2: int
-    y2: int
     confidence: int
-    image: np.ndarray
+    image: str
 
 @dataclass
 class Frame:

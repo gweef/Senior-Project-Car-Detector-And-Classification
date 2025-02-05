@@ -9,6 +9,7 @@ import pickle
 from src.class_for_project import Car
 from ui.class_ui import AppUI
 from src.main_system import main_system
+from src.utils import delete_clash
 
 # สถานะการยกเลิก (pass-by-reference)
 cancel_flag = [False]  # ใช้ list เพื่อให้สามารถแก้ไขค่าได้ใน Thread
@@ -156,10 +157,6 @@ def export_action(app_ui:AppUI,full):
             "H": car.h,
             "S": car.s,
             "V": car.v,
-            "X1": car.x1,
-            "Y1": car.y1,
-            "X2": car.x2,
-            "Y2": car.y2,
             "Confidence": car.confidence,
         }
         for car in savetable
@@ -239,5 +236,11 @@ def reset_action(app_ui:AppUI):
     app_ui.video_frame.place(x=380, y=20, width=400, height=305)
     app_ui.start_button.place(x=505, y=340, width=150, height=50)
     
+    
+# ฟังก์ชันที่จะเรียกใช้เมื่อกดปุ่มปิด X
+def on_closing(root):
+    if messagebox.askokcancel("ออกจากโปรแกรม", "คุณต้องการออกจากโปรแกรมและลบไฟล์ทั้งหมดหรือไม่?"):
+        delete_clash()  # เรียกใช้ฟังก์ชันลบไฟล์
+        root.destroy()  # ปิดโปรแกรม
 
 

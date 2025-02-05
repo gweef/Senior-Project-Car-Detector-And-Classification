@@ -6,6 +6,7 @@ import pickle
 import os
 import pandas as pd
 from tkinter import messagebox, filedialog
+import numpy as np
 
 # ฟังก์ชันสำหรับแปลงวิดีโอเป็นเฟรมโดยเก็บในหน่วยความจำ
 def video_to_frames(video_path, fps_out):
@@ -79,6 +80,111 @@ def filter_car(cars, type_filter, color_filter):
         if str(car.type).lower() in [t.lower() for t in type_filter] and car.color.lower() in [c.lower() for c in color_filter]
     ]
     return cars_filtered
+
+def save_to_memmap(array: np.ndarray, file_path: str) -> str:
+    """
+    บันทึก np.ndarray ลงในไฟล์ .dat โดยใช้ np.memmap
+    
+    Parameters:
+        array (np.ndarray): อาร์เรย์ที่ต้องการบันทึก
+        file_path (str): พาธของไฟล์ .dat ที่จะบันทึก
+    
+    Returns:
+        str: พาธของไฟล์ .dat ที่ถูกบันทึก
+    """
+    if array is None:
+        raise ValueError("Input array is None. Cannot save to memmap.")
+
+    shape = array.shape
+    dtype = array.dtype
+
+    # ตรวจสอบและสร้างไดเรกทอรีถ้ายังไม่มี
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    # ใช้ memmap เพื่อเขียนข้อมูลลงไฟล์
+    memmap_array = np.memmap(file_path, dtype=dtype, mode='w+', shape=shape)
+    memmap_array[:] = array[:]
+    memmap_array.flush()  # บันทึกข้อมูลลงดิสก์
+
+    return file_path
+
+def load_from_memmap(file_path: str, shape: tuple, dtype: np.dtype) -> np.memmap:
+    """
+    โหลดข้อมูลจากไฟล์ .dat เป็น np.memmap
+    
+    Parameters:
+        file_path (str): พาธของไฟล์ .dat
+        shape (tuple): รูปร่างของอาร์เรย์ที่บันทึก
+        dtype (np.dtype): ประเภทของข้อมูลที่บันทึก
+    
+    Returns:
+        np.memmap: อ็อบเจ็กต์ memmap ที่สามารถใช้งานได้เหมือน np.ndarray
+    """
+    return np.memmap(file_path, dtype=dtype, mode='r', shape=shape)
+
+
+def manage_imageresults(id,image, color_results):
+    if color_results == "null":
+        return 0
+    else :
+        #จัดการการบัยนทึกภาพ
+        file_path = f"clash/{id}.dat"
+        image_resized = resize_with_padding(image, target_size=(512, 512))
+        return save_to_memmap(image_resized, file_path)
+    
+    
+def resize_with_padding(image, target_size):
+    """
+    ปรับขนาดภาพโดยรักษาอัตราส่วนเดิม และเติมขอบ (padding) เพื่อให้พอดีกับ target_size
+
+    Parameters:
+        image (np.ndarray): ภาพต้นฉบับ
+        target_size (tuple): ขนาดเป้าหมาย (width, height)
+
+    Returns:
+        np.ndarray: ภาพที่ถูกปรับขนาดและเติมขอบ
+    """
+    original_height, original_width = image.shape[:2]
+    target_width, target_height = target_size
+
+    # คำนวณอัตราส่วนการย่อขนาด
+    scale = min(target_width / original_width, target_height / original_height)
+
+    # คำนวณขนาดใหม่ที่รักษาอัตราส่วนเดิม
+    new_width = int(original_width * scale)
+    new_height = int(original_height * scale)
+
+    # ย่อขนาดภาพ
+    resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
+    # คำนวณ padding ที่ต้องเติม
+    top_pad = (target_height - new_height) // 2
+    bottom_pad = target_height - new_height - top_pad
+    left_pad = (target_width - new_width) // 2
+    right_pad = target_width - new_width - left_pad
+
+    # เติมขอบด้วยสีดำ (0) หรือสีขาว (255) ถ้าต้องการ
+    padded_image = cv2.copyMakeBorder(resized_image, top_pad, bottom_pad, left_pad, right_pad,
+                                      cv2.BORDER_CONSTANT, value=[0, 0, 0])
+
+    return padded_image
+
+    
+def delete_clash():
+    folder_path = "clash"  # กำหนดโฟลเดอร์ที่ต้องการลบไฟล์
+
+    # ตรวจสอบว่าโฟลเดอร์มีอยู่จริง
+    if os.path.exists(folder_path):
+        for file_name in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, file_name)
+            if os.path.isfile(file_path):  # ตรวจสอบว่าเป็นไฟล์ ไม่ใช่โฟลเดอร์
+                os.remove(file_path)
+                print(f"ลบไฟล์: {file_path}")
+    else:
+        print("โฟลเดอร์ไม่มีอยู่")
+
+
+
 
 
 def saveVariable(variable,file_path) :

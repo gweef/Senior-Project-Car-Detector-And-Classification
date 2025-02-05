@@ -16,8 +16,9 @@ def main_system(video_path,selected_types, selected_colors,cancel_flag, log_call
     #video_path = "D:/SeniorProject/(1)main/project/data/sideview03_10s.mp4"  # พาธของไฟล์วิดีโอ
     angle = 0 #มุมข้าง
     fps_out = 3  # 1 เฟรม ต่อ 1 วินาที (for test)
-    
     log_callback("Processing...")
+    
+    utils.delete_clash() #ลบรูปจากรอบก่อน
 
     try:
         # ดึงเฟรมจากวิดีโอ
@@ -39,7 +40,7 @@ def main_system(video_path,selected_types, selected_colors,cancel_flag, log_call
             
             for j in range(len(car_croped)):
                 interest_croped = detector.interest_point(car_croped[j],angle) ### เพิ่มเขียน try กรณีไมีเจอล้อด้วย ########################################
-                print(interest_croped)
+                print("complete interest point")
                 if isinstance(interest_croped, int) and interest_croped == 0 :
                     color_name_classify,h,s,v = 'null',0,0,0
                 elif isinstance(interest_croped, np.ndarray):
@@ -59,12 +60,8 @@ def main_system(video_path,selected_types, selected_colors,cancel_flag, log_call
                     h=h,
                     s=s,
                     v=v,
-                    x1=x1[j],
-                    y1=y1[j],
-                    x2=x2[j],
-                    y2=y2[j],
                     confidence = conf[j],
-                    image = car_croped[j]
+                    image = utils.manage_imageresults(car_id,car_croped[j],color_name_classify)
                 )
                 cars.append(car)
                 car_id = car_id + 1
