@@ -8,8 +8,11 @@ import pandas as pd
 from tkinter import messagebox, filedialog
 import numpy as np
 
+from src.config import IMAGE_SHAPE
+from src.class_for_project import Car
+
 # ฟังก์ชันสำหรับแปลงวิดีโอเป็นเฟรมโดยเก็บในหน่วยความจำ
-def video_to_frames(video_path, fps_out):
+def video_to_frames(video_path, fps_out,cancel_flag):
     """
     ลดเฟรมเรทของวิดีโอให้เหลือ fps_out และคืนค่ารายการของเฟรมที่เลือก
     :param video_path: เส้นทางไฟล์วิดีโอที่นำเข้า
@@ -50,6 +53,9 @@ def video_to_frames(video_path, fps_out):
             times.append(float(f"{time:.2f}"))
             timestamps.append(timestamp)
         frame_count += 1
+        if cancel_flag[0]:  # ตรวจสอบสถานะการยกเลิก
+            cap.release()
+            return
 
     cap.release()
     return frames,times,timestamps
@@ -77,7 +83,7 @@ def filter_car(cars, type_filter, color_filter):
     # กรองเฉพาะรถที่ type และ color ตรงกับ filter
     cars_filtered = [
         car for car in cars 
-        if str(car.type).lower() in [t.lower() for t in type_filter] and car.color.lower() in [c.lower() for c in color_filter]
+        if str(car.type).lower() in [str(t).lower() for t in type_filter] and str(car.color).lower() in [c.lower() for c in color_filter]
     ]
     return cars_filtered
 
@@ -128,8 +134,9 @@ def manage_imageresults(id,image, color_results):
         return 0
     else :
         #จัดการการบัยนทึกภาพ
-        file_path = f"clash/{id}.dat"
-        image_resized = resize_with_padding(image, target_size=(512, 512))
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        file_path = f"clash/id_{id}.dat"
+        image_resized = resize_with_padding(image, target_size=IMAGE_SHAPE[:2])
         return save_to_memmap(image_resized, file_path)
     
     
@@ -182,8 +189,6 @@ def delete_clash():
                 print(f"ลบไฟล์: {file_path}")
     else:
         print("โฟลเดอร์ไม่มีอยู่")
-
-
 
 
 

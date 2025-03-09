@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image, ImageTk
+import os
+import numpy as np
 
+from src.config import IMAGE_SHAPE
 
 class AppUI:
     def __init__(self, root):
@@ -9,23 +13,28 @@ class AppUI:
         
         # ตัวเลือกประเภทและสี
         self.types = ["Sedan", "SUV", "Pick-Up", "Van", "Bus", "Truck", "Motorcycle"]
-        self.colors = ["Black", "Gray", "Silver", "White", "Red", "Blue", "Yellow", "Green", "Brown", "Pink", "Purple"]
+        self.colors = ["Black", "Gray", "Silver", "White", "Red", "Blue", "Yellow", "green3", "Brown", "Pink", "Purple"]
         self.type_vars = [tk.BooleanVar() for _ in self.types]
         self.color_vars = [tk.BooleanVar() for _ in self.colors]
         
         self.processing_result = None
         self.processing_fullresult = None
+        
+        self.image_file_list = None
+        self.current_index = 0
 
         # สร้าง UI ต่างๆ
         self.type_frame = self.create_type_frame(root)
         self.color_frame = self.create_color_frame(root)
         self.video_frame = self.create_video_button(root)
         self.start_button = self.create_start_button(root)
+        self.loadfile_button = self.create_loadfile_button(root)
         self.waiting_frame = self.create_waiting_frame(root)
         self.start_detial_frame,self.start_detial_label = self.create_start_detial_frame(root)
         self.log_frame, self.log_message = self.create_log_frame(root)
         self.cancel_button = self.create_cancel_button(root)
         self.progress_bar = self.create_progress_bar(self.waiting_frame)
+        self.waitingimage_Frame = self.create_waitingimage_Frame(root)
         self.complete_frame = self.create_complete_frame(root)
         self.details_button = self.create_details_button(root)
         self.export_button = self.create_export_button(root)
@@ -40,18 +49,20 @@ class AppUI:
         self.reset_button = self.create_reset_button(root)
         # สร้างตารางใน Frame
         self.data_table = self.create_data_table(root)
+        self.dropdown,self.selected_file = self.create_dropdown(self.dataimage_Frame)
+        self.canvas = self.create_canvas(self.showimage_Frame)
         
         
         
         # เก็บ UI Components ที่ต้องการซ่อนใน List
         self.all_ui_components = [
             self.type_frame, self.color_frame, self.video_frame, 
-            self.start_button, self.waiting_frame, self.start_detial_frame,
-            self.log_frame, self.cancel_button, self.complete_frame,
+            self.start_button,self.loadfile_button,self.waiting_frame, self.waitingimage_Frame,
+            self.start_detial_frame,self.log_frame, self.cancel_button, self.complete_frame,
             self.details_button,self.data_table,self.export_button,self.exportvar_button,
             self.exportfull_button,self.exportfull_button,self.exportfullvar_button,
             self.showimage_Frame,self.saveimage_button,self.previousimage_button,
-            self.nextimage_button,self.reset_button,self.dataimage_Frame
+            self.nextimage_button,self.reset_button,self.dataimage_Frame,self.dropdown,self.canvas
         ]
 
     def create_type_frame(self, root):
@@ -110,6 +121,11 @@ class AppUI:
         button = tk.Button(root, text="Start", bg="lime", font=("Arial", 18))
         button.place(x=505, y=340, width=150, height=50)
         return button
+    
+    def create_loadfile_button(self, root):
+        button = tk.Button(root, text="Load File", bg="deepskyblue", font=("Arial", 18))
+        button.place(x=505, y=440, width=150, height=50)
+        return button
 
     def create_waiting_frame(self, root):
         frame = tk.Frame(root, bg="skyblue", bd=2, relief="ridge")
@@ -152,6 +168,10 @@ class AppUI:
         progress_bar = ttk.Progressbar(parent_frame, orient="horizontal", mode="indeterminate", length=200)
         progress_bar.pack(pady=10)
         return progress_bar
+    
+    def create_waitingimage_Frame(self,root):
+        frame = tk.Frame(root, bg="seagreen1", bd=2, relief="ridge")
+        return frame
 
     def create_complete_frame(self, root):
         frame = tk.Frame(root, bg="skyblue", bd=2, relief="ridge")
@@ -159,11 +179,11 @@ class AppUI:
         return frame
     
     def create_details_button(self, root):
-        button = tk.Button(root, text="View Details", bg="green", font=("Arial", 18))
+        button = tk.Button(root, text="View Details", bg="lime", font=("Arial", 18))
         return button
     
     def create_export_button(self, root):
-        button = tk.Button(root, text="Export File", bg="blue", font=("Arial", 18))
+        button = tk.Button(root, text="Export File", bg="deepskyblue", font=("Arial", 18))
         return button
     
     def hide_all_ui(self):
@@ -176,37 +196,37 @@ class AppUI:
         return selected_types, selected_colors
     
     def create_exportFull_button(self, root):
-        button = tk.Button(root, text="Export Full File", bg="blue", font=("Arial", 15))
+        button = tk.Button(root, text="Export Full File", bg="deepskyblue", font=("Arial", 15))
         return button
 
     def create_exportVar_button(self,root):
-        button = tk.Button(root, text="Export Var(.plk)", bg="blue", font=("Arial", 15))
+        button = tk.Button(root, text="Save File", bg="lime", font=("Arial", 15))
         return button
     
     def create_exportFullVar_button(self,root):
-        button = tk.Button(root, text="Export Full Var", bg="blue", font=("Arial", 15))
+        button = tk.Button(root, text="Export Full Var", bg="lime", font=("Arial", 15))
         return button
     
     def create_showimage_Frame(self,root):
-        frame = tk.Frame(root, bg="green", bd=2, relief="ridge")
-        tk.Label(frame, text="image", bg="green", font=("Arial", 24)).pack(pady=20)
+        frame = tk.Frame(root, bg="seagreen1", bd=2, relief="ridge")
+        #tk.Label(frame, text="image", bg="green3", font=("Arial", 24)).pack(pady=20)
         return frame
     
     def create_dataimage_Frame(self,root):
         frame = tk.Frame(root, bg="skyblue", bd=2, relief="ridge")
-        tk.Label(frame, text="dataimage", bg="skyblue", font=("Arial", 12)).pack(pady=8)
+        #tk.Label(frame, text="dataimage", bg="skyblue", font=("Arial", 12)).pack(pady=8)
         return frame
     
     def create_saveimage_button(self,root):
-        button = tk.Button(root, text="Save Image", bg="blue", font=("Arial", 18))
+        button = tk.Button(root, text="Save Image", bg="mediumspringgreen", font=("Arial", 18))
         return button
     
     def create_previousimage_button(self,root):
-        button = tk.Button(root, text="<", bg="blue", font=("Arial", 25))
+        button = tk.Button(root, text="<", bg="seagreen1", font=("Arial", 25))
         return button
     
     def create_nextimage_button(self,root):
-        button = tk.Button(root, text=">", bg="blue", font=("Arial", 25))
+        button = tk.Button(root, text=">", bg="seagreen1", font=("Arial", 25))
         return button
     
     def create_reset_button(self,root):
@@ -260,3 +280,31 @@ class AppUI:
         # เติมข้อมูลใหม่
         for item in data:
             self.treeview.insert("", "end", values=(item["carID"], item["Time"], item["Type"], item["Color"]))
+            
+    def load_image(self, filename):
+        filepath = os.path.join("clash", filename)
+        try:
+            memmap_array = np.memmap(filepath, dtype=np.uint8, mode='r', shape=IMAGE_SHAPE)
+            image = Image.fromarray(memmap_array, "RGB") 
+            self.tk_image = ImageTk.PhotoImage(image)
+            self.canvas.configure(image=self.tk_image)
+        except Exception as e:
+            print("Error", f"Failed to load image: {e}")
+            
+    def load_selected_image(self, event):
+        self.current_index = self.image_file_list.index(self.selected_file.get())
+        self.load_image(self.image_file_list[self.current_index])
+            
+    def create_dropdown(self, dataimage_Frame):
+        selected_file = tk.StringVar()
+        #selected_file.set(self.image_file_list[self.current_index])
+        dropdown = ttk.Combobox(dataimage_Frame, textvariable=selected_file, values=self.image_file_list, state="readonly")
+        dropdown.pack()
+        dropdown.bind("<<ComboboxSelected>>", self.load_selected_image)
+        self.selected_file = selected_file
+        return dropdown,selected_file
+
+    def create_canvas(self, showimage_Frame):
+        canvas = tk.Label(showimage_Frame)
+        canvas.pack()
+        return canvas

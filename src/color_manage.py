@@ -26,7 +26,7 @@ def get_achromatic_color_name(hsv_pixel):
             return 'Gray'
         elif 6 < bin_v <= 11 and bin_s <= 1:  # Value อยู่ในช่วงนี้ ถือว่าเป็นสีเงิน
             return 'Silver'    
-    return None
+    return get_color_name_from_HSV(hsv_pixel)
 
 # ฟังก์ชันตรวจสอบว่าพิกเซลนั้นเป็นสีอะไรในกรณีมีสี
 def get_color_name_from_HSV(hsv_pixel):
@@ -39,13 +39,15 @@ def get_color_name_from_HSV(hsv_pixel):
         elif 3 < bin_h <= 5:
             return 'Brown'
         elif 5 < bin_h <= 11:
-            return 'Yellow-Gold'
+            return 'Yellow'
         elif 11 < bin_h <=26:
             return 'Green'
         elif 26 < bin_h <= 46:
             return 'Blue'
-        elif 46 < bin_h <=56 :
-            return 'Pink-Purple'
+        elif 46 < bin_h <=51 :
+            return 'Purple'
+        elif 51 < bin_h <=56 :
+            return 'Pink'
     return 'Unknown'
 
 #--------------------------------------------------------------------------------------------------------------
@@ -96,8 +98,8 @@ def blur_edit(image):
     #blur_edited = image
     return blur_edited
 
-def k_means_clustering(image):
-    kernal = 12 # 11 color + 1 unknow
+def k_means_clustering(image,k):
+    kernal = k # 11 color + 1 unknow
     # แปลงเป็นค่า HSV
     hsv_image = cv.cvtColor(image, cv.COLOR_BGR2HSV)
     
@@ -117,18 +119,25 @@ def k_means_clustering(image):
     v = dominant_color[2]
     return h,s,v
 
-def hsv_classify(h,s,v):
-    hsv_color = [h,s,v]
+
+def hsv_classify(image):
     
+    h,s,v = k_means_clustering(image,2)
     # ตรวจสอบกลุ่มสีไม่มีสี (Achromatic)
+    hsv_color = [h,s,v]
     achromatic_color = get_achromatic_color_name(hsv_color)
     
     if achromatic_color:
-        return achromatic_color
+        h,s,v = k_means_clustering(image,4)
+        hsv_color = [h,s,v]
+        achromatic_color = get_achromatic_color_name(hsv_color)
+        return achromatic_color,h,s,v
     else:
         # ตรวจสอบกลุ่มสีที่มีสี
+        h,s,v = k_means_clustering(image,7)
+        hsv_color = [h,s,v]
         color_name = get_color_name_from_HSV(hsv_color)
-        return color_name
+        return color_name,h,s,v
     
     '''
     color_name = 'red'
@@ -137,8 +146,11 @@ def hsv_classify(h,s,v):
 
 def color_classifier(image):
     #luminance_edited = luminance_edit(image)
+    
     blur_edited = blur_edit(image) 
-    h,s,v = k_means_clustering(blur_edited)
-    color_name_classify = hsv_classify(h,s,v)
-    print(color_name_classify)
+    
+    #h,s,v = k_means_clustering(blur_edited)
+    
+    color_name_classify,h,s,v = hsv_classify(blur_edited)
+    
     return color_name_classify,h,s,v

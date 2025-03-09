@@ -1,6 +1,6 @@
 import tkinter as tk
 from ui.class_ui import AppUI
-from ui.component import on_start, cancel_action, open_video_file,export_action,details_action,exportvar_action,resetcall,on_closing
+from ui.component import on_start,loadfile_action, cancel_action, open_video_file,export_action,details_action,exportvar_action,resetcall,show_previous,show_next,save_image_action,on_closing
 
 
 def main_ui() :
@@ -14,6 +14,10 @@ def main_ui() :
     # ตั้งค่าปุ่ม Start
     app_ui.start_button.config(
         command=lambda: on_start(app_ui)
+    )
+    
+    app_ui.loadfile_button.config(
+        command=lambda: loadfile_action(app_ui)
     )
     
     #ปุ่มเลือกวิดีโอ
@@ -48,6 +52,18 @@ def main_ui() :
     
     app_ui.reset_button.config(
         command= lambda : resetcall(app_ui)
+    )
+    
+    app_ui.previousimage_button.config(
+        command= lambda : show_previous(app_ui)
+    )
+    
+    app_ui.nextimage_button.config(
+        command= lambda : show_next(app_ui)
+    )
+    
+    app_ui.saveimage_button.config(
+        command= lambda : save_image_action(app_ui)
     )
     
     root.protocol("WM_DELETE_WINDOW", lambda: on_closing(root))
