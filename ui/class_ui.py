@@ -13,7 +13,7 @@ class AppUI:
         
         # ตัวเลือกประเภทและสี
         self.types = ["Sedan", "SUV", "Pick-Up", "Van", "Bus", "Truck", "Motorcycle"]
-        self.colors = ["Black", "Gray", "Silver", "White", "Red", "Blue", "Yellow", "green3", "Brown", "Pink", "Purple"]
+        self.colors = ["Black", "Gray", "Silver", "White", "Red", "Blue", "Yellow", "Green", "Brown", "Pink", "Purple"]
         self.type_vars = [tk.BooleanVar() for _ in self.types]
         self.color_vars = [tk.BooleanVar() for _ in self.colors]
         

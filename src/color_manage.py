@@ -36,17 +36,17 @@ def get_color_name_from_HSV(hsv_pixel):
     if bin_s >= 4 and bin_v >= 2:
         if (0 <= bin_h <= 3) or (57 <= bin_h <= 60):
             return 'Red'
-        elif 3 < bin_h <= 5:
+        elif 3 < bin_h <= 6:
             return 'Brown'
-        elif 5 < bin_h <= 11:
+        elif 6 < bin_h <= 11:
             return 'Yellow'
         elif 11 < bin_h <=26:
             return 'Green'
-        elif 26 < bin_h <= 46:
+        elif 26 < bin_h <= 40:
             return 'Blue'
-        elif 46 < bin_h <=51 :
+        elif 40 < bin_h <=46 :
             return 'Purple'
-        elif 51 < bin_h <=56 :
+        elif 46 < bin_h <=56 :
             return 'Pink'
     return 'Unknown'
 

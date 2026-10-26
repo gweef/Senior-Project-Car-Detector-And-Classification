@@ -26,7 +26,7 @@ def video_to_frames(video_path, fps_out,cancel_flag):
     
     # อ่านข้อมูลเฟรมเรตเดิมของวิดีโอ
     original_fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_interval = int(original_fps / fps_out)  # คำนวณจำนวนเฟรมที่ต้องข้าม
+    frame_interval = int(original_fps/fps_out)  # คำนวณจำนวนเฟรมที่ต้องข้าม
     
     frames  = []
     times = []
@@ -129,13 +129,13 @@ def load_from_memmap(file_path: str, shape: tuple, dtype: np.dtype) -> np.memmap
     return np.memmap(file_path, dtype=dtype, mode='r', shape=shape)
 
 
-def manage_imageresults(id,image, color_results):
+def manage_imageresults(id,image, color_results,car_type):
     if color_results == "null":
         return 0
     else :
-        #จัดการการบัยนทึกภาพ
+        #จัดการการบันทึกภาพ
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        file_path = f"clash/id_{id}.dat"
+        file_path = f"clash/{id}_{car_type}_{color_results}.dat"
         image_resized = resize_with_padding(image, target_size=IMAGE_SHAPE[:2])
         return save_to_memmap(image_resized, file_path)
     

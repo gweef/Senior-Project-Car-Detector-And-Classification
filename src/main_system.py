@@ -68,7 +68,7 @@ def main_system(video_path,selected_types, selected_colors,cancel_flag, log_call
                     v=v,
                     confidence = conf[j],
                     #image = utils.manage_imageresults(car_id,interest_croped,color_name_classify)
-                    image = utils.manage_imageresults(car_id,car_croped[j],color_name_classify)
+                    image = utils.manage_imageresults(car_id,car_croped[j],color_name_classify,car_type[j])
                 )
                 cars.append(car)
                 print(f"{car_id},{car_type[j]}")
