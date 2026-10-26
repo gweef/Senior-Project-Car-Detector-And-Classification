@@ -1,0 +1,21 @@
+# Core calculation and array manipulation
+numpy
+
+# Computer Vision and Image Processing
+opencv-python
+
+# YOLOv8 for Object Detection
+ultralytics
+
+# Data Manipulation and Export (Excel/CSV)
+pandas
+openpyxl  # Required by pandas to export to .xlsx
+
+# Machine Learning (K-Means Clustering)
+scikit-learn
+
+# Image handling for Tkinter GUI
+Pillow
+
+# Plotting and visualization (Imported in main_system.py)
+matplotlib
