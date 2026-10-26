@@ -62,4 +62,4 @@ An end-to-end computer vision desktop application designed to automatically dete
 *   Color classification relies on the targeted ROI; if the wheel/windshield detection fails, the system falls back to a null state for that specific vehicle to prevent false color logging.
 
 ## 👨‍💻 Author
-**[Your Name/Username]** - *Computer Engineering Graduate / AI Developer*
+**[Thada Mumsua]** - *Computer Engineering Graduate / AI Developer*
